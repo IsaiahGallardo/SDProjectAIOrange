@@ -4,7 +4,8 @@ def heatmap(values, res_x, res_y, spr=0.25, range_x=None, range_y=None):
     """
     Create a heatmap from a list of values.
 
-    values: list of values, where each value is a tuple (x, y, w)
+    values: list of values, where each value is a tuple (x, y, w), where x and y
+        are the coordinates of the value and w is the weight of the value
     res_x: resolution of the x axis
     res_y: resolution of the y axis
     spr: the amount of spread to the neighbouring pixels
@@ -30,5 +31,5 @@ def heatmap(values, res_x, res_y, spr=0.25, range_x=None, range_y=None):
                 x2 = x + offset[0]
                 y2 = y + offset[1]
                 if 0 <= x2 < res_x and 0 <= y2 < res_y:
-                    heatmap[x2][y2] += w*offset[2]
+                    heatmap[y2][x2] += w*offset[2]
     return heatmap
