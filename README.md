@@ -1,1 +1,1 @@
-Code for the AU Baseball AI Orange Team for Senior Design Project
+Code for the AU Baseball AI Orange Team for Senior Design Project.
