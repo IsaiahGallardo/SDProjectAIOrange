@@ -31,7 +31,7 @@ print('max W: ', maxw)
 baseball_data['PitchCall'] = baseball_data['PitchCall'].astype(int)
 baseball_data['PitchCall'].value_counts()
 
-# removes outliers based on 3 standard deviations from mean -- don't have to use
+# removes outliers based on 3 standard deviations from mean -- don't have to use!!
 new_df = baseball_data[(baseball_data['PlateLocSide'] < 2.7) & (baseball_data['PlateLocSide'] > -2.8)]
 new_df = new_df[(new_df['PlateLocHeight'] < 5.4) & (new_df['PlateLocHeight'] > -0.8)]
 
