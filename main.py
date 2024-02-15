@@ -17,7 +17,6 @@ baseball_data.loc[baseball_data["PitchCall"] == "HitByPitch", "PitchCall"] = 0
 baseball_data.loc[baseball_data["PitchCall"] == "BallinDirt", "PitchCall"] = 0
 baseball_data.loc[baseball_data["PitchCall"] == "Undefined", "PitchCall"] = 0
 baseball_data.loc[baseball_data["PitchCall"] == "BallInDirt", "PitchCall"] = 0
-#print(baseball_data.tail())
 
 minh = min(baseball_data['PlateLocHeight'])
 maxh = max(baseball_data['PlateLocHeight'])
@@ -38,11 +37,21 @@ new_df = new_df[(new_df['PlateLocHeight'] < 5.4) & (new_df['PlateLocHeight'] > -
 
 gravesdata = baseball_data[baseball_data['Pitcher'] == 'Graves, Griffin']
 
-values = [(row['PlateLocHeight'], row['PlateLocSide'], row['PitchCall']) for index, row in gravesdata.iterrows()]
-hmap = heatmap(values, 15, 15, range_x=(1, 3.5), range_y=(-1.5, 1.5))
+# these are the ranges for the x and y axis. cuttoff were chosen 
+# somewhat arbitrarily based on the observed spread of the data
+rx = (1, 3.5)
+ry = (-1.5, 1.5)
 
-#plt.imshow(heatmap, cmap='hot', interpolation='nearest')
-#plt.show()
-plt.imshow(hmap, cmap='hot', interpolation='nearest')
+# calculates the resolution of the heatmap. res is the maximum resolution
+# of either axis. resx and resy are the calculated resolutions for the x and y
+# where the aspect ratio is preserved.
+res = 20
+resx = int(res / max(rx[1] - rx[0], ry[1] - ry[0]) * (rx[1] - rx[0]))
+resy = int(res / max(rx[1] - rx[0], ry[1] - ry[0]) * (ry[1] - ry[0]))
+
+values = [(row['PlateLocHeight'], row['PlateLocSide'], row['PitchCall']) for index, row in gravesdata.iterrows()]
+hmap = heatmap(values, resx, resy, spr=0.25, range_x=rx, range_y=ry)
+
+plt.imshow(hmap, cmap='hot', interpolation='nearest', origin='lower', extent=(rx[0], rx[1], ry[0], ry[1]))
 plt.show()
 
