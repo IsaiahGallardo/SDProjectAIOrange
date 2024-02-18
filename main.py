@@ -39,13 +39,13 @@ gravesdata = baseball_data[baseball_data['Pitcher'] == 'Graves, Griffin']
 
 # these are the ranges for the x and y axis. cuttoff were chosen 
 # somewhat arbitrarily based on the observed spread of the data
-rx = (1, 3.5)
+rx = (1, 4)
 ry = (-1.5, 1.5)
 
 # calculates the resolution of the heatmap. res is the maximum resolution
 # of either axis. resx and resy are the calculated resolutions for the x and y
 # where the aspect ratio is preserved.
-res = 20
+res = 24
 resx = int(res / max(rx[1] - rx[0], ry[1] - ry[0]) * (rx[1] - rx[0]))
 resy = int(res / max(rx[1] - rx[0], ry[1] - ry[0]) * (ry[1] - ry[0]))
 
