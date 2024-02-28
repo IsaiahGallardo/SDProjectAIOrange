@@ -6,3 +6,7 @@
 # ignores the pycache and pyc files
 __pycache__/
 *.pyc
+
+# ignores the .py file where I was testing random stuff
+randomstuff.py
+

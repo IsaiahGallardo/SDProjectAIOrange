@@ -50,8 +50,14 @@ resx = int(res / max(rx[1] - rx[0], ry[1] - ry[0]) * (rx[1] - rx[0]))
 resy = int(res / max(rx[1] - rx[0], ry[1] - ry[0]) * (ry[1] - ry[0]))
 
 values = [(row['PlateLocHeight'], row['PlateLocSide'], row['PitchCall']) for index, row in gravesdata.iterrows()]
+values_all = [(row['PlateLocHeight'], row['PlateLocSide'], 1) for index, row in gravesdata.iterrows()]
 hmap = heatmap(values, resx, resy, spr=0.25, range_x=rx, range_y=ry)
+hmap_all = heatmap(values_all, resx, resy, spr=0.25, range_x=rx, range_y=ry)
+
 
 plt.imshow(hmap, cmap='hot', interpolation='nearest', origin='lower', extent=(rx[0], rx[1], ry[0], ry[1]))
 plt.show()
+plt.imshow(hmap_all, cmap='hot', interpolation='nearest', origin='lower', extent=(rx[0], rx[1], ry[0], ry[1]))
+plt.show()
+
 

@@ -1,8 +1,18 @@
 
+def normalize(heatmap: list):
+    """
+    Normalizes a heatmap.
+
+    heatmap: the heatmap to normalize
+
+    return: a 2D list of values representing the normalized heatmap
+    """
+    max_value = max([max(row) for row in heatmap])
+    return [[value / max_value for value in row] for row in heatmap]
 
 def heatmap(values, res_x, res_y, spr=0.25, range_x=None, range_y=None):
     """
-    Create a heatmap from a list of values.
+    Creates a heatmap from a list of values.
 
     values: list of values, where each value is a tuple (x, y, w), where x and y
         are the coordinates of the value and w is the weight of the value.
@@ -37,3 +47,30 @@ def heatmap(values, res_x, res_y, spr=0.25, range_x=None, range_y=None):
                 if 0 <= x2 < res_x and 0 <= y2 < res_y:
                     heatmap[y2][x2] += w*offset[2]
     return heatmap
+
+def div_heatmap(h1: list, h2: list):
+    """
+    Divides two heatmaps.
+
+    h1: the numerator heatmap
+    h2: the denominator heatmap
+
+    return: a 2D list of values representing the quotient heatmap
+    """
+    if len(h1) != len(h2) or len(h1[0]) != len(h2[0]):
+        raise ValueError("Heatmaps are not the same size")
+    heatmap = [[0 for i in range(len(h1[0]))] for j in range(len(h1))]
+    for i in range(len(h1)):
+        for j in range(len(h1[0])):
+            if h2[i][j] != 0:
+                heatmap[i][j] = h1[i][j] / h2[i][j]
+    return heatmap
+
+def save_to_image(heatmap: list, filename: str):
+    """
+    Saves a heatmap to an image file.
+
+    heatmap: the heatmap to save
+    filename: the name of the file to save the heatmap to
+    """
+    
