@@ -14,23 +14,32 @@ def gen_report_data(df):
     # loops through each unique pitcher
     names = df['Pitcher'].unique()
     for name in names:
+        # creates new dataset
+        name_df = df[df['Pitcher'] == name]
+
         # gets (general) text output and saves to text file corresponding to their name
         text_output = gen_report_text()
         f = open(name + ".txt", "w")
         f.write(text_output)
         f.close()
+
         # gets (general) image output and saves to jpg file corresponding to their name
         image_output = gen_report_images()
         im1 = Image.open(image_output)
         im1 = im1.save(name + ".jpg")
+
         # loops through all the kinds of pitches for that person
-        pitch_type = df[('TaggedPitchType')].unique()
+        pitch_type = name_df[('TaggedPitchType')].unique()
         for pitches in pitch_type:
+            # creates new dataset
+            pitch_df = name_df[name_df['TaggedPitchType'] == pitches]
+
             # gets pitch specific text output and saves to text file corresponding to their name and pitch
             text_output_pitch = gen_report_text()
             f = open(name + pitches + ".txt", "w")
             f.write(text_output_pitch)
             f.close()
+
             # gets pitch specific image output and saves to text file corresponding to their name and pitch
             image_output_pitch = gen_report_images()
             im1 = Image.open(image_output_pitch)
