@@ -36,6 +36,7 @@ new_df = new_df[(new_df['PlateLocHeight'] < 5.4) & (new_df['PlateLocHeight'] > -
 
 
 gravesdata = baseball_data[baseball_data['Pitcher'] == 'Graves, Griffin']
+fastballdata = gravesdata[gravesdata['TaggedPitchType'] == 'Fastball']
 
 # these are the ranges for the x and y axis. cuttoff were chosen 
 # somewhat arbitrarily based on the observed spread of the data
@@ -51,13 +52,21 @@ resy = int(res / max(rx[1] - rx[0], ry[1] - ry[0]) * (ry[1] - ry[0]))
 
 values = [(row['PlateLocHeight'], row['PlateLocSide'], row['PitchCall']) for index, row in gravesdata.iterrows()]
 values_all = [(row['PlateLocHeight'], row['PlateLocSide'], 1) for index, row in gravesdata.iterrows()]
+values_fastball = [(row['PlateLocHeight'], row['PlateLocSide'], row['PitchCall']) for index, row in fastballdata.iterrows()]
+values_all_fastball = [(row['PlateLocHeight'], row['PlateLocSide'], 1) for index, row in fastballdata.iterrows()]
 hmap = heatmap(values, resx, resy, spr=0.25, range_x=rx, range_y=ry)
 hmap_all = heatmap(values_all, resx, resy, spr=0.25, range_x=rx, range_y=ry)
+hmap_fastball = heatmap(values_fastball, resx, resy, spr=0.25, range_x=rx, range_y=ry)
+hmap_all_fastball = heatmap(values_all_fastball, resx, resy, spr=0.25, range_x=rx, range_y=ry)
 
 
 plt.imshow(hmap, cmap='hot', interpolation='nearest', origin='lower', extent=(rx[0], rx[1], ry[0], ry[1]))
 plt.show()
 plt.imshow(hmap_all, cmap='hot', interpolation='nearest', origin='lower', extent=(rx[0], rx[1], ry[0], ry[1]))
+plt.show()
+plt.imshow(hmap_fastball, cmap='hot', interpolation='nearest', origin='lower', extent=(rx[0], rx[1], ry[0], ry[1]))
+plt.show()
+plt.imshow(hmap_all_fastball, cmap='hot', interpolation='nearest', origin='lower', extent=(rx[0], rx[1], ry[0], ry[1]))
 plt.show()
 
 
