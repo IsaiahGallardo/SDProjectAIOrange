@@ -1,7 +1,8 @@
 import numpy as np
-
+import pandas as pd
 from PIL import Image
-import PIL
+
+from heatmap import heatmap, div_heatmap, save_to_image
 
 def gen_report_text(avg_vertical_breaks):
    report_text = ""
@@ -10,55 +11,120 @@ def gen_report_text(avg_vertical_breaks):
         report_text += f"Pitcher: {name}, Pitch Type: {pitches}, Average Vertical Break: {avg_vertical_break}\n"
         return report_text
 
-def gen_report_images():
-    pass
+def gen_report_images(df: pd.DataFrame, folder: str, name: str, p_type: str):
+
+    # these are the ranges for the x and y axis. cuttoff were chosen 
+    # somewhat arbitrarily based on the observed spread of the data
+    rx = (1, 3.5)
+    ry = (-1.5, 1.5)
+
+    # calculates the resolution of the heatmap. res is the maximum resolution
+    # of either axis. resx and resy are the calculated resolutions for the x and y
+    # where 
+    # the aspect ratio is preserved.
+    res = 20
+    resx = int(res / max(rx[1] - rx[0], ry[1] - ry[0]) * (rx[1] - rx[0]))
+    resy = int(res / max(rx[1] - rx[0], ry[1] - ry[0]) * (ry[1] - ry[0]))
+
+    values = [(row['PlateLocHeight'], row['PlateLocSide'], row['PitchCall']) for index, row in df.iterrows()]
+    values_all = [(row['PlateLocHeight'], row['PlateLocSide'], 1) for index, row in df.iterrows()]
+    hmap = heatmap(values, resx, resy, spr=0.25, range_x=rx, range_y=ry)
+    hmap_all = heatmap(values_all, resx, resy, spr=0.25, range_x=rx, range_y=ry)
+    hmap_ratio = div_heatmap(hmap, hmap_all)
+
+    save_to_image(hmap_all, folder + name + '_' + p_type + '_AllPitches', 'All Pitches', (rx[0], rx[1], ry[0], ry[1]))
+    save_to_image(hmap, folder + name + '_' + p_type + '_SuccessfulPitches', 'Successful Pitches', (rx[0], rx[1], ry[0], ry[1]))
+    save_to_image(hmap_ratio, folder + name + '_' + p_type + '_SuccessRatio', 'Success Ratio', (rx[0], rx[1], ry[0], ry[1]))
 
 # takes the dataframe as the parameter in order to split the data by pitcher and later
 # by pitch type
-def gen_report_data(df):
+def gen_report_data(df: pd.DataFrame, folder: str, all_pitches_only: bool = False):
     avg_vertical_breaks = {}
     # loops through each unique pitcher
     names = df['Pitcher'].unique()
     for name in names:
+        # makes sure the name is actually a string
+        # there was a bug where the name was nan for some reason
+        if not isinstance(name, str):
+            continue
+
+        # this was used to avoid having to redo everything after fixing the nan bug
+        """
+        # checks if the file already exists
+        filename = folder + name + '_All_AllPitches'
+        try:
+            img = Image.open(filename + '.png')
+            img.close()
+            continue
+        except FileNotFoundError:
+            pass
+        print(name)
+        """
+
         # creates new dataset
         name_df = df[df['Pitcher'] == name]
 
+        """
         # gets (general) text output and saves to text file corresponding to their name
         text_output = gen_report_text()
         f = open(name + ".txt", "w")
         f.write(text_output)
         f.close()
+        """
 
-        # gets (general) image output and saves to jpg file corresponding to their name
-        image_output = gen_report_images()
-        im1 = Image.open(image_output)
-        im1 = im1.save(name + ".jpg")
+        gen_report_images(name_df, folder, name, 'All')
+        if not all_pitches_only:
+            # loops through all the kinds of pitches for that person
+            pitch_type = name_df[('TaggedPitchType')].unique()
+            for pitches in pitch_type:
+                # creates new dataset
+                pitch_df = name_df[name_df['TaggedPitchType'] == pitches]
 
-        # loops through all the kinds of pitches for that person
-        pitch_type = name_df[('TaggedPitchType')].unique()
-        for pitches in pitch_type:
-            # creates new dataset
-            pitch_df = name_df[name_df['TaggedPitchType'] == pitches]
+                """
+                avg_vertical_break = np.mean(pitch_df['VertBreak'])
+                avg_vertical_breaks[(name, pitches)] = avg_vertical_break
 
-            avg_vertical_break = np.mean(pitch_df['VertBreak'])
-            avg_vertical_breaks[(name, pitches)] = avg_vertical_break
+                # gets pitch specific text output and saves to text file corresponding to their name and pitch
+                text_output_pitch = gen_report_text(avg_vertical_breaks)
+                f = open(name + pitches + ".txt", "w")
+                f.write(text_output_pitch)
+                f.close()
+                """
 
-            # gets pitch specific text output and saves to text file corresponding to their name and pitch
-            text_output_pitch = gen_report_text(avg_vertical_breaks)
-            f = open(name + pitches + ".txt", "w")
-            f.write(text_output_pitch)
-            f.close()
-
-            # gets pitch specific image output and saves to text file corresponding to their name and pitch
-            image_output_pitch = gen_report_images()
-            im1 = Image.open(image_output_pitch)
-            im1.save(name + ".jpg")
-            im1.close()
-    # these two lines below i am unsure of...
-    # what is this function supposed to return? There will be too many images/text files to reference?
-    latex_output = report_to_latex()
-    return latex_output
+                gen_report_images(pitch_df, folder, name, pitches)
 
 
-def report_to_latex():
-    pass
+def report_to_latex(report_name: str, folder: str, players: list[str]):
+
+    f = open(report_name + ".tex", "w")
+
+    s = """
+    \\documentclass{article}
+    \\usepackage[margin=0.5in]{geometry}
+    \\usepackage{graphicx}
+
+    \\title{Pitcher Report}
+
+    \\begin{document}
+
+    \\maketitle
+    """
+    f.write(s)
+    for i, p in enumerate(players):
+        # checks if p is a string
+        if not isinstance(p, str):
+            continue
+        if i % 2 == 0:
+            f.write('\\newpage')
+        s = f"""
+        \\section*{{{p}}}
+        \\begin{{figure}}[h!]
+            \\centering
+            \\includegraphics[width=0.32\\textwidth]{{{folder}/{p}_All_AllPitches.png}}
+            \\includegraphics[width=0.32\\textwidth]{{{folder}/{p}_All_SuccessfulPitches.png}}
+            \\includegraphics[width=0.32\\textwidth]{{{folder}/{p}_All_SuccessRatio.png}}
+        \\end{{figure}}
+        """
+        f.write(s)
+    f.write('\\end{document}')
+    f.close()

@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 
 def normalize(heatmap: list):
     """
@@ -66,11 +67,14 @@ def div_heatmap(h1: list, h2: list):
                 heatmap[i][j] = h1[i][j] / h2[i][j]
     return heatmap
 
-def save_to_image(heatmap: list, filename: str):
+def save_to_image(heatmap: list, filename: str, fig_title: str, ext: tuple):
     """
     Saves a heatmap to an image file.
 
     heatmap: the heatmap to save
     filename: the name of the file to save the heatmap to
     """
-    
+
+    plt.imshow(heatmap, cmap='hot', interpolation='nearest', origin='lower', extent=ext)
+    plt.title(fig_title)
+    plt.savefig(filename + '.png', bbox_inches='tight')

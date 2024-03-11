@@ -3,6 +3,15 @@
 # ignores the csv files
 *.csv
 
+# ignores the .png files
+*.png
+
+# ignores the latex related files
+*.pdf
+*.tex
+*.aux
+*.log
+
 # ignores the pycache and pyc files
 __pycache__/
 *.pyc
