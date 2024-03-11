@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 
 from heatmap import heatmap
+from reportutils import gen_report_data, report_to_latex
 
 baseball_data = pd.read_csv('TrackMan_NoStuff_Master.csv')
 baseball_data = baseball_data[['Pitcher', 'Batter', 'PitchCall', 'PlateLocHeight', 'PlateLocSide']]
@@ -69,4 +70,5 @@ plt.show()
 plt.imshow(hmap_all_fastball, cmap='hot', interpolation='nearest', origin='lower', extent=(rx[0], rx[1], ry[0], ry[1]))
 plt.show()
 
-
+gen_report_data(baseball_data, 'ImageFolder\\', True)
+report_to_latex('testreport', 'ImageFolder', baseball_data['Pitcher'].unique())
