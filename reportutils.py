@@ -40,8 +40,9 @@ def gen_report_images(df: pd.DataFrame, folder: str, name: str, p_type: str):
 # by pitch type
 def gen_report_data(df: pd.DataFrame, folder: str, all_pitches_only: bool = False):
     avg_vertical_breaks = {}
-    # loops through each unique pitcher
-    names = df['Pitcher'].unique()
+    # loops through each unique pitcher on the 2024 roster
+    names = ["Myers, Carson", "Bauman, Tanner", "Graves, Griffin", "Sofield, Drew", "Keplinger, Konner", "Copeland, Konner", "Crotchfelt, Zach", "Nelson, Drew", "Schorr, Ben", "Watts, Dylan", "Carlson, Parker", "Herberholz, Christian", "Cannon, Will", "McBride, Conner", "Tilly, Cam", "Armstrong, John", "Petrovic, Alex", "Gonzalez, Joseph", "Allsup, Chase", "Keshock, Cameron", "Murphy, Hayden"]
+
     for name in names:
         # makes sure the name is actually a string
         # there was a bug where the name was nan for some reason
