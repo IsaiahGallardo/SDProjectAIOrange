@@ -94,7 +94,7 @@ def gen_report_data(df: pd.DataFrame, folder: str, all_pitches_only: bool = Fals
                 gen_report_images(pitch_df, folder, name, pitches)
 
 
-def report_to_latex(report_name: str, folder: str, players: list[str]):
+def report_to_latex(report_name: str, folder: str, players: list[str], pitch_types: list[str]):
 
     f = open(report_name + ".tex", "w")
 
@@ -114,8 +114,8 @@ def report_to_latex(report_name: str, folder: str, players: list[str]):
         # checks if p is a string
         if not isinstance(p, str):
             continue
-        if i % 2 == 0:
-            f.write('\\newpage')
+        
+        f.write('\\newpage')
         s = f"""
         \\section*{{{p}}}
         \\begin{{figure}}[h!]
@@ -126,5 +126,15 @@ def report_to_latex(report_name: str, folder: str, players: list[str]):
         \\end{{figure}}
         """
         f.write(s)
+        for p_type in pitch_types:
+            s = f"""
+            \\begin{{figure}}[h!]
+                \\centering
+                \\includegraphics[width=0.32\\textwidth]{{{folder}/{p}_{p_type}_AllPitches.png}}
+                \\includegraphics[width=0.32\\textwidth]{{{folder}/{p}_{p_type}_SuccessfulPitches.png}}
+                \\includegraphics[width=0.32\\textwidth]{{{folder}/{p}_{p_type}_SuccessRatio.png}}
+            \\end{{figure}}
+            """
+            f.write(s)
     f.write('\\end{document}')
     f.close()
