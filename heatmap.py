@@ -2,21 +2,36 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def heatmap(values, res_x, res_y, spr=0.5, range_x=None, range_y=None):
+def heatmap(values: list[tuple[float, float, float]],
+            res_x: int,
+            res_y: int,
+            spr: float = 0.5,
+            range_x: tuple = None,
+            range_y: tuple = None, 
+            norm: bool = False
+            ) -> np.ndarray:
     """
     Creates a heatmap from a list of values.
 
-    values: list of values, where each value is a tuple (x, y, w), where x and y
+    values: 
+        list of values, where each value is a tuple (x, y, w), where x and y
         are the coordinates of the value and w is the weight of the value.
-    res_x: resolution of the x axis
-    res_y: resolution of the y axis
-    spr: the amount of spread to the neighbouring pixels. if not specified, it is set to 0.5.
-    range_x: the range of the x inputs (min, max) to include in the heatmap.
+    res_x: 
+        resolution of the x axis
+    res_y: 
+        resolution of the y axis
+    spr: 
+        the amount of spread to the neighbouring pixels. if not specified, it is set to 0.5.
+    range_x: 
+        the range of the x inputs (min, max) to include in the heatmap.
         If the x value is outside of this range, it is ignored. If not specified,
         the range is set to the min and max of the data
-    range_y: the range of the y inputs (min, max) to include in the heatmap.
+    range_y: 
+        the range of the y inputs (min, max) to include in the heatmap.
         If the y value is outside of this range, it is ignored. If not specified,
         the range is set to the min and max of the data
+    norm: 
+        whether or not to normalize the heatmap
 
     return: a res_x by res_y np.ndarray representing the heatmap
     """
@@ -39,14 +54,32 @@ def heatmap(values, res_x, res_y, spr=0.5, range_x=None, range_y=None):
     heatmap = np.apply_along_axis(lambda x: np.convolve(x, kernel, mode='same'), 0, heatmap)
     heatmap = np.apply_along_axis(lambda x: np.convolve(x, kernel, mode='same'), 1, heatmap)
 
+    if norm:
+        normalize(heatmap)
+
     return heatmap
 
-def div_heatmap(h1: np.ndarray, h2: np.ndarray):
+def normalize(heatmap: np.ndarray) -> np.ndarray:
+    """
+    Normalizes a heatmap.
+
+    heatmap: 
+        the heatmap to normalize
+
+    return: a np.ndarray representing the normalized heatmap
+    """
+    return heatmap / np.max(heatmap)
+
+def div_heatmap(h1: np.ndarray, 
+                h2: np.ndarray
+                ) -> np.ndarray:
     """
     Divides two heatmaps.
 
-    h1: the numerator heatmap
-    h2: the denominator heatmap
+    h1: 
+        the numerator heatmap
+    h2: 
+        the denominator heatmap
 
     return: a 2D list of values representing the quotient heatmap
     """
@@ -54,26 +87,31 @@ def div_heatmap(h1: np.ndarray, h2: np.ndarray):
         raise ValueError("Heatmaps must be the same shape")
     return h1 / (h2 + 1e-9)
 
-def normalize(heatmap: np.ndarray):
-    """
-    Normalizes a heatmap.
-
-    heatmap: the heatmap to normalize
-
-    return: a np.ndarray representing the normalized heatmap
-    """
-    return heatmap / np.max(heatmap)
-
-def save_to_image(heatmap: list, filename: str, fig_title: str, ext: tuple):
+def save_to_image(heatmap: np.ndarray, 
+                  filename: str, 
+                  fig_title: str, 
+                  ext: tuple[float, float, float, float],
+                  cmap: str = 'Reds'
+                  ) -> None:
     """
     Saves a heatmap to an image file.
-    https://matplotlib.org/stable/users/explain/colors/colormaps.html -- here are all the color maps!
 
-    heatmap: the heatmap to save
-    filename: the name of the file to save the heatmap to
+    heatmap: 
+        the heatmap to save
+    filename: 
+        the name of the file to save the heatmap to
+    fig_title: 
+        the title of the heatmap
+    ext: 
+        the extent of the heatmap. This should be a tuple (x_min, x_max, y_min, y_max)
+    cmap: 
+        the color map to use. possible colors: 
+        https://matplotlib.org/stable/users/explain/colors/colormaps.html
+
+    return: None
     """
 
-    plt.imshow(heatmap, cmap='Reds', interpolation='nearest', origin='lower', extent=ext)
+    plt.imshow(heatmap, cmap=cmap, interpolation='nearest', origin='lower', extent=ext)
     plt.title(fig_title)
     plt.savefig(filename + '.png', bbox_inches='tight')
 
