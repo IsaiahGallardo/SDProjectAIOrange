@@ -5,10 +5,12 @@ import pandas as pd
 from heatmap import heatmap
 from reportutils import gen_report_data, report_to_latex
 
+## Read in data first and separate based on columns we will actually use
 baseball_data = pd.read_csv('TrackMan_NoStuff_Master.csv')
-baseball_data = baseball_data[['Pitcher', 'Batter', 'PitchCall', 'PlateLocHeight', 'PlateLocSide']]
+baseball_data = baseball_data[['Pitcher', 'Batter', 'PitchCall', 'PlateLocHeight', 'PlateLocSide', 'TaggedPitchType', 'InducedVertBreak', 'HorzBreak', 'RelHeight']]
 print(baseball_data.tail())
 
+## Encode favorable vs unfavorable outcomes
 baseball_data.loc[baseball_data["PitchCall"] == "StrikeCalled", "PitchCall"] = 1
 baseball_data.loc[baseball_data["PitchCall"] == "StrikeSwinging", "PitchCall"] = 1
 baseball_data.loc[baseball_data["PitchCall"] == "BallCalled", "PitchCall"] = 0
@@ -19,6 +21,7 @@ baseball_data.loc[baseball_data["PitchCall"] == "BallinDirt", "PitchCall"] = 0
 baseball_data.loc[baseball_data["PitchCall"] == "Undefined", "PitchCall"] = 0
 baseball_data.loc[baseball_data["PitchCall"] == "BallInDirt", "PitchCall"] = 0
 
+## Get the boundaries for the heat maps
 minh = min(baseball_data['PlateLocHeight'])
 maxh = max(baseball_data['PlateLocHeight'])
 minw = min(baseball_data['PlateLocSide'])
@@ -28,47 +31,10 @@ print('max H: ', maxh)
 print('min W: ', minw)
 print('max W: ', maxw)
 
-baseball_data['PitchCall'] = baseball_data['PitchCall'].astype(int)
-baseball_data['PitchCall'].value_counts()
+## Make heat maps for only people on roster and certain types of pitches
+names = ["Myers, Carson", "Bauman, Tanner", "Graves, Griffin", "Sofield, Drew", "Keplinger, Konner", "Copeland, Konner", "Crotchfelt, Zach", "Nelson, Drew", "Schorr, Ben", "Watts, Dylan", "Carlson, Parker", "Herberholz, Christian", "Cannon, Will", "McBride, Conner", "Tilly, Cam", "Armstrong, John", "Petrovic, Alex", "Gonzalez, Joseph", "Allsup, Chase", "Keshock, Cameron", "Murphy, Hayden"]
+pitch_types = ["Fastball", "Slider", "ChangeUp", "FourSeamFastBall", "Sinker", "Curveball", "Cutter", "Splitter", "TwoSeamFastBall"]
 
-# removes outliers based on 3 standard deviations from mean -- don't have to use!!
-new_df = baseball_data[(baseball_data['PlateLocSide'] < 2.7) & (baseball_data['PlateLocSide'] > -2.8)]
-new_df = new_df[(new_df['PlateLocHeight'] < 5.4) & (new_df['PlateLocHeight'] > -0.8)]
-
-
-gravesdata = baseball_data[baseball_data['Pitcher'] == 'Graves, Griffin']
-fastballdata = gravesdata[gravesdata['TaggedPitchType'] == 'Fastball']
-
-# these are the ranges for the x and y axis. cuttoff were chosen 
-# somewhat arbitrarily based on the observed spread of the data
-rx = (1, 4)
-ry = (-1.5, 1.5)
-
-# calculates the resolution of the heatmap. res is the maximum resolution
-# of either axis. resx and resy are the calculated resolutions for the x and y
-# where the aspect ratio is preserved.
-res = 24
-resx = int(res / max(rx[1] - rx[0], ry[1] - ry[0]) * (rx[1] - rx[0]))
-resy = int(res / max(rx[1] - rx[0], ry[1] - ry[0]) * (ry[1] - ry[0]))
-
-values = [(row['PlateLocHeight'], row['PlateLocSide'], row['PitchCall']) for index, row in gravesdata.iterrows()]
-values_all = [(row['PlateLocHeight'], row['PlateLocSide'], 1) for index, row in gravesdata.iterrows()]
-values_fastball = [(row['PlateLocHeight'], row['PlateLocSide'], row['PitchCall']) for index, row in fastballdata.iterrows()]
-values_all_fastball = [(row['PlateLocHeight'], row['PlateLocSide'], 1) for index, row in fastballdata.iterrows()]
-hmap = heatmap(values, resx, resy, spr=0.25, range_x=rx, range_y=ry)
-hmap_all = heatmap(values_all, resx, resy, spr=0.25, range_x=rx, range_y=ry)
-hmap_fastball = heatmap(values_fastball, resx, resy, spr=0.25, range_x=rx, range_y=ry)
-hmap_all_fastball = heatmap(values_all_fastball, resx, resy, spr=0.25, range_x=rx, range_y=ry)
-
-
-plt.imshow(hmap, cmap='hot', interpolation='nearest', origin='lower', extent=(rx[0], rx[1], ry[0], ry[1]))
-plt.show()
-plt.imshow(hmap_all, cmap='hot', interpolation='nearest', origin='lower', extent=(rx[0], rx[1], ry[0], ry[1]))
-plt.show()
-plt.imshow(hmap_fastball, cmap='hot', interpolation='nearest', origin='lower', extent=(rx[0], rx[1], ry[0], ry[1]))
-plt.show()
-plt.imshow(hmap_all_fastball, cmap='hot', interpolation='nearest', origin='lower', extent=(rx[0], rx[1], ry[0], ry[1]))
-plt.show()
-
+## Generate the report
 gen_report_data(baseball_data, 'ImageFolder\\', True)
-report_to_latex('testreport', 'ImageFolder', baseball_data['Pitcher'].unique())
+report_to_latex('testreport', 'ImageFolder', names, pitch_types)

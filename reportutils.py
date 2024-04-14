@@ -1,10 +1,14 @@
 import numpy as np
 import pandas as pd
 from PIL import Image
-
 from heatmap import heatmap, div_heatmap, save_to_image
 
+
 def gen_report_text(avg_vertical_breaks, avg_horizontal_breaks, avg_release_heights):
+    """
+
+    """
+
     text_output = ""
     for (name, pitches), avg_vert_break in avg_vertical_breaks.items():
         avg_horz_break = avg_horizontal_breaks.get((name, pitches), "N/A")
@@ -14,8 +18,11 @@ def gen_report_text(avg_vertical_breaks, avg_horizontal_breaks, avg_release_heig
 
 
 def gen_report_images(df: pd.DataFrame, folder: str, name: str, p_type: str):
+    """
 
-    # these are the ranges for the x and y axis. cuttoff were chosen 
+    """
+
+    # these are the ranges for the x and y axis. cuttoff were chosen
     # somewhat arbitrarily based on the observed spread of the data
     rx = (1, 3.5)
     ry = (-1.5, 1.5)
@@ -41,9 +48,18 @@ def gen_report_images(df: pd.DataFrame, folder: str, name: str, p_type: str):
 # takes the dataframe as the parameter in order to split the data by pitcher and later
 # by pitch type
 def gen_report_data(df: pd.DataFrame, folder: str, all_pitches_only: bool = False):
+    """
+    Generates all necessary data for the report
+
+    df : the dataframe containing the entire dataset
+    folder : location image files will be saved
+    all_pitches_only : whether or not to include all types of pitches (helps with runtime)
+    """
+
     avg_vertical_breaks = {}
     avg_horizontal_breaks = {}
     avg_release_heights = {}
+
     # loops through each unique pitcher on the 2024 roster
     names = ["Myers, Carson", "Bauman, Tanner", "Graves, Griffin", "Sofield, Drew", "Keplinger, Konner", "Copeland, Konner", "Crotchfelt, Zach", "Nelson, Drew", "Schorr, Ben", "Watts, Dylan", "Carlson, Parker", "Herberholz, Christian", "Cannon, Will", "McBride, Conner", "Tilly, Cam", "Armstrong, John", "Petrovic, Alex", "Gonzalez, Joseph", "Allsup, Chase", "Keshock, Cameron", "Murphy, Hayden"]
 
@@ -70,12 +86,13 @@ def gen_report_data(df: pd.DataFrame, folder: str, all_pitches_only: bool = Fals
         name_df = df[df['Pitcher'] == name]
 
         """
-        # gets (general) text output and saves to text file corresponding to their name
+        # Gets (general) text output and saves to text file corresponding to their name
         text_output = gen_report_text()
         f = open(name + ".txt", "w")
         f.write(text_output)
         f.close()
         """
+
         for pitches in name_df['TaggedPitchType'].unique():
             pitch_df = name_df[name_df['TaggedPitchType'] == pitches]
             avg_vertical_break = pitch_df['InducedVertBreak'].mean()
@@ -86,6 +103,7 @@ def gen_report_data(df: pd.DataFrame, folder: str, all_pitches_only: bool = Fals
             avg_release_heights[(name, pitches)] = avg_release_height
 
         gen_report_images(name_df, folder, name, 'All')
+
         if not all_pitches_only:
             # loops through all the kinds of pitches for that person
             pitch_type = name_df[('TaggedPitchType')].unique()
@@ -107,7 +125,11 @@ def gen_report_data(df: pd.DataFrame, folder: str, all_pitches_only: bool = Fals
                 gen_report_images(pitch_df, folder, name, pitches)
     text_output = gen_report_text(avg_vertical_breaks, avg_horizontal_breaks, avg_release_heights)
 
+
 def report_to_latex(report_name: str, folder: str, players: list[str], pitch_types: list[str]):
+    """
+
+    """
 
     f = open(report_name + ".tex", "w")
 
