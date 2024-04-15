@@ -8,7 +8,8 @@ def gen_report_text(avg_vertical_breaks, avg_horizontal_breaks, avg_release_heig
     """
 
     """
-
+    # creates a text output summarizing information about pitchers, 
+    # their pitch types, and average break measurements. 
     text_output = ""
     for (name, pitches), avg_vert_break in avg_vertical_breaks.items():
         avg_horz_break = avg_horizontal_breaks.get((name, pitches), "N/A")
@@ -149,7 +150,7 @@ def report_to_latex(report_name: str, folder: str, players: list[str], pitch_typ
         # checks if p is a string
         if not isinstance(p, str):
             continue
-        
+        # LaTeX commands to the file handle
         f.write('\\newpage')
         s = f"""
         \\section*{{{p}}}
