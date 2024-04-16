@@ -19,3 +19,6 @@ __pycache__/
 # ignores the .py file where I was testing random stuff
 randomstuff.py
 
+# ignores the file with the database URL
+db_info.txt
+db_layout.txt
