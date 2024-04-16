@@ -43,7 +43,7 @@ for pitcher in pitcher_names:
                     INNER JOIN trackman_metadata ON trackman_pitcher."PitchUID" = trackman_metadata."PitchUID"
                     WHERE trackman_pitcher."Pitcher" = '{pitcher}' 
                     AND trackman_pitcher."PitcherTeam" = '{team_name}'
-                    AND trackman_pitcher."TaggedPitchType" = {pitch_type};""")
+                    AND trackman_pitcher."TaggedPitchType" = '{pitch_type}';""")
         values = cur.fetchall()
 
         print(len(values))
