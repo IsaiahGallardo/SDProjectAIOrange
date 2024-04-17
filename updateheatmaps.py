@@ -39,11 +39,13 @@ pitch_types = ['Fastball', 'Slider', 'ChangeUp', 'FourSeamFastBall', 'Sinker', '
 success = ['StrikeCalled', 'StrikeSwinging', 'FoulBall']    # These are the pitch calls that are considered as successes
 
 for team_name in team_names:
+    team_name = team_name.replace("'", "''")
     # get pitcher names
     cur.execute(f"""SELECT DISTINCT "Pitcher" FROM trackman_pitcher WHERE "PitcherTeam" = '{team_name}';""")
     pitcher_names = cur.fetchall()
     pitcher_names = [row[0] for row in pitcher_names]
     for pitcher in pitcher_names:
+        pitcher = pitcher.replace("'", "''")
         # The heatmaps for all pitch types combined are calculated as the sum of 
         # the heatmaps for each pitch type. This saves a bunch of time since every 
         # pitch doesn't need to be queried a second time for the all pitch types heatmap
