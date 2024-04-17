@@ -33,7 +33,7 @@ resy = int(res / max(rx[1] - rx[0], ry[1] - ry[0]) * (ry[1] - ry[0]))
 cur.execute("""SELECT DISTINCT "PitcherTeam" FROM trackman_pitcher;""")
 team_names = cur.fetchall()
 team_names = [row[0] for row in team_names]
-# team_names = ['AUB_TIG']  # Uncomment this to only run for the AU Team
+team_names = ['AUB_TIG']  # Uncomment this to only run for the AU Team
 
 pitch_types = ['Fastball', 'Slider', 'ChangeUp', 'FourSeamFastBall', 'Sinker', 'Curveball', 'Cutter', 'Splitter', 'TwoSeamFastBall']
 success = ['StrikeCalled', 'StrikeSwinging', 'FoulBall']    # These are the pitch calls that are considered as successes
@@ -62,7 +62,7 @@ for team_name in team_names:
                 values = cur.fetchall()
 
                 if len(values) == 0:
-                    # print(f"No data for {pitcher} and {pitch_type}")
+                    print(f"No data for {pitcher} and {pitch_type}")
                     continue
 
                 values = [(float(row[0]), float(row[1]), 1.0 if row[2] in success else 0.0) for row in values]
@@ -93,14 +93,15 @@ for team_name in team_names:
                 print(e)
                 print(f"Error with {pitcher} and {pitch_type}")
         
-        if sum(all_types_hmap_all) == 0:
-            # print(f"No data for {pitcher} and AllPitchTypes")
-            continue
-        
+        all_types_hmap_ratio = all_types_hmap / (all_types_hmap_all + 1e-6)
         # Normalizes, flattens, and converts the heatmaps to standard python lists
         all_types_hmap = normalize(all_types_hmap).flatten().tolist()
         all_types_hmap_all = normalize(all_types_hmap_all).flatten().tolist()
-        all_types_hmap_ratio = normalize(all_types_hmap / (all_types_hmap_all + 1e-6)).flatten().tolist()
+        all_types_hmap_ratio = normalize(all_types_hmap_ratio).flatten().tolist()
+
+        if sum(all_types_hmap_all) == 0:
+            print(f"No data for {pitcher} and AllPitchTypes")
+            continue
 
         try:
             # Write the heatmaps for all pitch types to the database
