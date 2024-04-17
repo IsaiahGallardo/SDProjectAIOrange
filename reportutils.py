@@ -1,6 +1,4 @@
-import numpy as np
 import pandas as pd
-from PIL import Image
 from heatmap import heatmap, div_heatmap, save_to_image
 
 

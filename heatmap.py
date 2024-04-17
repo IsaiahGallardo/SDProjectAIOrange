@@ -68,7 +68,10 @@ def normalize(heatmap: np.ndarray) -> np.ndarray:
 
     return: a np.ndarray representing the normalized heatmap
     """
-    return heatmap / np.max(heatmap)
+    max_val = np.max(heatmap)
+    if max_val == 0:
+        return heatmap
+    return heatmap / max_val
 
 def div_heatmap(h1: np.ndarray, 
                 h2: np.ndarray
