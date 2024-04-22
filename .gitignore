@@ -1,4 +1,5 @@
-
+# ignores the virtual environment
+venv/
 
 # ignores the csv files
 *.csv
