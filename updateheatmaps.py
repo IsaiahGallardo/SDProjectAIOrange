@@ -17,8 +17,12 @@ con = psycopg2.connect(**args)
 cur = con.cursor()
 
 # these are the ranges for the x and y axis.
-rx = (1, 3.5)
-ry = (-1.5, 1.5)
+rx = (-2.45, 2.35)
+ry = (-0.75, 5)
+
+# these are the ranges for the strike zone
+strike_x = (-0.86, 0.86)
+strike_y = (1.59, 3.13)
 
 # calculates the resolution of the heatmap. res is the maximum resolution
 # of either axis. resx and resy are the calculated resolutions for the x and y
