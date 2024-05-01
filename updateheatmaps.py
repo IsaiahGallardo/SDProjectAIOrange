@@ -18,8 +18,8 @@ con = psycopg2.connect(**args)
 cur = con.cursor()
 
 # these are the ranges for the x and y axis.
-rx = (-2.45, 2.35)
-ry = (-0.75, 5)
+rx = (1, 3.5)
+ry = (-1.5, 1.5)
 
 # these are the ranges for the strike zone
 strike_x = (-0.86, 0.86)
